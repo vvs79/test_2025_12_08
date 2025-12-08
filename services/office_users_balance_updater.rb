@@ -45,8 +45,8 @@ class OfficeUsersBalanceUpdater < ApplicationService
 
     return if vacations.blank?
 
-    dates_count = vacations.inject(0) do |sum, v|
-      sum + (v.start_date.to_date..v.finish_date.to_date).count { |date| dates.include?(date.to_s) }
+    dates_count = vacations.sum |v|
+      (v.start_date.to_date..v.finish_date.to_date).count { |date| dates.include?(date.to_s) }
     end
     dates_count
   end
