@@ -15,8 +15,8 @@ class OfficeUsersBalanceUpdater < ApplicationService
     @office.users&.active&.includes(:vacations)&.find_each do |user|
       # increase_balance(user) if @non_working_dates.present?
       # decrease_balance(user) if @working_dates.present?
-      @dates_hash.each do |method, val|
-        user.public_send(:"#{method}_vacation_balance", change_balance(user, val))
+      @dates_hash.each do |key, val|
+        user.public_send(:"#{key}_vacation_balance", change_balance(user, val))
       end
     end
   end
