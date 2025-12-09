@@ -1,18 +1,23 @@
 class OfficeUsersBalanceUpdater < ApplicationService
   def initialize(office_id, dates_that_change_balance)
     @office = Office.find_by(id: office_id)
-    @non_working_dates = dates_that_change_balance[:non_working_dates]
-    @working_dates = dates_that_change_balance[:working_dates]
+    # @non_working_dates = dates_that_change_balance[:non_working_dates]
+    # @working_dates = dates_that_change_balance[:working_dates]
+    @dates_hash = {
+      increase: dates_that_change_balance[:non_working_dates],
+      decrease: dates_that_change_balance[:working_dates]
+    }.compact
   end
 
   def call
-    return if @non_working_dates.blank? && @working_dates.blank?
+    return if @office.nil? || @dates_hash.empty?
 
-    @office&.users&.active&.includes(:vacations)&.find_each do |user|
+    @office.users&.active&.includes(:vacations)&.find_each do |user|
       # increase_balance(user) if @non_working_dates.present?
       # decrease_balance(user) if @working_dates.present?
-      user.increase_vacation_balance(change_balance(user, @non_working_dates)) if @non_working_dates.present?
-      user.decrease_vacation_balance(change_balance(user, @working_dates)) if @working_dates.present?
+      @dates_hash.each do |method, val|
+        user.public_send(:"#{method}_vacation_balance", change_balance(user, val))
+      end
     end
   end
 
