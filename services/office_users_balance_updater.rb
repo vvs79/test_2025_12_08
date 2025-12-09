@@ -6,7 +6,7 @@ class OfficeUsersBalanceUpdater < ApplicationService
   end
 
   def call
-    @office&.users&.active&.each do |user|
+    @office&.users&.active&.find_each do |user|
       # increase_balance(user) if @non_working_dates.present?
       # decrease_balance(user) if @working_dates.present?
       user.increase_vacation_balance(change_balance(user, @non_working_dates)) if @non_working_dates.present?
@@ -45,7 +45,7 @@ class OfficeUsersBalanceUpdater < ApplicationService
 
     return if vacations.blank?
 
-    dates_count = vacations.sum |v|
+    dates_count = vacations.sum do |v|
       (v.start_date.to_date..v.finish_date.to_date).count { |date| dates.include?(date.to_s) }
     end
     dates_count
