@@ -8,7 +8,7 @@ class OfficeUsersBalanceUpdater < ApplicationService
   def call
     return if @non_working_dates.blank? && @working_dates.blank?
 
-    @office&.users&.active&.find_each do |user|
+    @office&.users&.active&.includes(:vacations)&.find_each do |user|
       # increase_balance(user) if @non_working_dates.present?
       # decrease_balance(user) if @working_dates.present?
       user.increase_vacation_balance(change_balance(user, @non_working_dates)) if @non_working_dates.present?
